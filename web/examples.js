@@ -54,6 +54,7 @@ Main():void =
         Print("no scores, no average: the division failed")
     Print("as floats: 25.0 / 3.0 = {25.0 / 3.0}")
     Print("0.1 + 0.2 = {0.1 + 0.2}, and 1.0 / 0.0 = {1.0 / 0.0}")
+    Print("Sqrt(2.0) = {Sqrt(2.0)}, Pow(2.0, 10.0) = {Pow(2.0, 10.0)}")
 `,
     args: '',
   },
