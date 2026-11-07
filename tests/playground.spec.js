@@ -41,7 +41,7 @@ test('all examples, text arguments, and transactional rollback', async ({ page }
   await page.selectOption('#example', 'loops');
   expect(await run(page)).toBe('2 / 2 = 1\n4 / 2 = 2\n6 / 2 = 3\n8 / 2 = 4\n10 / 2 = 5');
   await page.selectOption('#example', 'numbers');
-  expect(await run(page)).toBe('the exact average is between 8 and 9\nexactly 25/3\nno scores, no average: the division failed\nas floats: 25.0 / 3.0 = 8.333333333333334\n0.1 + 0.2 = 0.30000000000000004, and 1.0 / 0.0 = Inf');
+  expect(await run(page)).toBe('the exact average is between 8 and 9\nexactly 25/3\nno scores, no average: the division failed\nas floats: 25.0 / 3.0 = 8.333333333333334\n0.1 + 0.2 = 0.30000000000000004, and 1.0 / 0.0 = Inf\nSqrt(2.0) = 1.4142135623730951, Pow(2.0, 10.0) = 1024.0');
   await page.selectOption('#example', 'shapes');
   expect(await run(page)).toBe('a square of area 9\na rectangle of area 10\n2 shapes\ntotal area: 19\nthe last is a rectangle');
   await page.selectOption('#example', 'args');
