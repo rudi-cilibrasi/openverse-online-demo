@@ -140,6 +140,10 @@ paths support hosting below a subdirectory. Keep the service worker beside
 `index.html`, preserve the `wasm/` subdirectory, and serve `.wasm` as
 `application/wasm`. Use revalidation (`Cache-Control: no-cache`) for the service
 worker, JavaScript, and WASM assets so a new build does not mix versions.
+Hosts that cannot set headers still work: the service worker revalidates the
+WASM modules whenever it starts (`fetch(…, { cache: 'no-cache' })`, a 304 when
+unchanged), so GitHub Pages' ten-minute `max-age` cannot pair a new worker with
+an old module.
 There is no backend compiler or third-party CDN dependency.
 
 ## Verify
