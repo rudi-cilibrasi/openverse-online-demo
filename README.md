@@ -44,7 +44,7 @@ placed in `patches/openverse/` or `patches/lean4/` is applied idempotently to th
 build checkout; today only Lean's runtime needs one.
 
 The pinned Lean runtime also needs [target compatibility fixes](patches/lean4/wasm-runtime.patch):
-two WASM stub signatures, two obsolete FFI world parameters, and exclusion of
+a WASM stub signature, two obsolete FFI world parameters, and exclusion of
 Unix signal-stack setup (WASM uses checked linear memory). The demo supplies a
 C++20 `bit_cast` fallback for Emscripten 3.1.6's old libc++ and derives the small
 `uv_strerror` function from libuv's public error map. Networking and filesystem
