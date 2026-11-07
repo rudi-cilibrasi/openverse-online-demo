@@ -15,7 +15,10 @@ function loadWasm(filename, label) {
       let response;
       let bytes;
       try {
-        response = await fetch(url);
+        // Revalidate (a 304 when unchanged): static hosts such as GitHub Pages
+        // send max-age=600, and a cached module from the previous deployment
+        // would not match this worker's freshly loaded JavaScript glue.
+        response = await fetch(url, { cache: 'no-cache' });
         if (response.ok) bytes = new Uint8Array(await response.arrayBuffer());
       } catch {
         throw new RunnerLoadError(`Could not load the ${label} (${filename}).\nCheck your connection and make sure the demo server is running, then try again.`);
