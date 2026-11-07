@@ -36,9 +36,9 @@ Main():void =
 `,
     args: '',
   },
-  fractions: {
-    source: `# Dividing ints gives an exact rational: 25 / 3 stays 25/3, never 8.
-# Dividing by zero fails, so a division sits in a failure context.
+  numbers: {
+    source: `# Ints divide exactly, into a rational: 25 / 3 stays 25/3, and dividing
+# by zero fails. Floats (IEEE 64-bit) approximate, and never fail.
 
 Average(Scores:[]int)<decides>:rational =
     var Total:int = 0
@@ -48,10 +48,12 @@ Average(Scores:[]int)<decides>:rational =
 
 Main():void =
     if (A := Average[array{7, 8, 10}]):
-        Print("the average is between {Floor(A)} and {Ceil(A)}")
+        Print("the exact average is between {Floor(A)} and {Ceil(A)}")
         if (A = 25 / 3) then Print("exactly 25/3")
     if (not Average[array{}]):
         Print("no scores, no average: the division failed")
+    Print("as floats: 25.0 / 3.0 = {25.0 / 3.0}")
+    Print("0.1 + 0.2 = {0.1 + 0.2}, and 1.0 / 0.0 = {1.0 / 0.0}")
 `,
     args: '',
   },
