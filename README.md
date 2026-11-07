@@ -1,5 +1,11 @@
 # OpenVerse online demo
 
+[![test](https://github.com/rudi-cilibrasi/openverse-online-demo/actions/workflows/test.yml/badge.svg)](https://github.com/rudi-cilibrasi/openverse-online-demo/actions/workflows/test.yml)
+
+**Try it: <https://rudi-cilibrasi.github.io/openverse-docs/demo/>**, published
+with the openverse books by [openverse-docs](https://github.com/rudi-cilibrasi/openverse-docs),
+which includes this repository as its `demo/` submodule.
+
 An editable Verse playground that compiles and runs entirely in a browser.
 It fetches [rudi-cilibrasi/openverse](https://github.com/rudi-cilibrasi/openverse.git),
 builds its Lean source compiler and C runtime as two WebAssembly modules, and
@@ -132,7 +138,9 @@ There is no backend compiler or third-party CDN dependency.
 
 ## Verify
 
-After building:
+CI (`.github/workflows/test.yml`) builds the playground from source and runs
+the browser tests on every push and pull request; the built `dist/` is the
+run's `playground` artifact. Locally, after building:
 
 ```sh
 npm ci

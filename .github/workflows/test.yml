@@ -1,0 +1,69 @@
+# Builds the playground from source (the pinned openverse and Lean, compiled to
+# WebAssembly) and runs its browser tests, on every push to main and every pull
+# request. The built dist/ is the "playground" artifact.
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      # The object cache is content-addressed, so an older cache stays useful when
+      # sources.json moves: only changed sources are recompiled.
+      - name: Cache elan, the Lean build and the WebAssembly objects
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.elan
+            .build/objects
+            .build/openverse/.lake
+          key: build-${{ runner.os }}-${{ hashFiles('sources.json', 'patches/**', 'wasm/**', 'scripts/build-wasm.py') }}
+          restore-keys: |
+            build-${{ runner.os }}-
+
+      - name: Install the build tools
+        run: |
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+          PATH="$HOME/.elan/bin:$PATH" scripts/install-deps.sh
+
+      - name: Build
+        run: scripts/build.sh
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Browser tests
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          npm test
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-results
+          path: test-results
+          if-no-files-found: ignore
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: playground
+          path: dist
+          if-no-files-found: error
