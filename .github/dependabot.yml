@@ -1,0 +1,13 @@
+# Keep the workflow's actions and the browser-test tooling current. The pinned
+# openverse and Lean revisions live in sources.json and are updated by hand,
+# since a new revision may need the compatibility patches revisited.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
