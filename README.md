@@ -68,7 +68,7 @@ runtime adapter and rerunning the browser tests.
 
 Choose an example, edit `Main.verse`, then click **Run code** (or Ctrl/⌘+Enter).
 The examples cover output, loops, failure contexts and rollback, exact rational
-arithmetic, classes behind an interface with overloading and a generic
+and float arithmetic, classes behind an interface with overloading and a generic
 function, and arguments.
 
 ```verse
@@ -112,8 +112,8 @@ service workers, so it is not a guarantee of offline operation after a reload.
    built-in arbitrary-precision arithmetic and allocator, rather than native
    libraries or a simplified replacement runtime. Host libuv headers provide
    declarations only; host binaries are never linked into WASM.
-4. The same script builds OpenVerse's seven C runtime source files with
-   `wasm/runtime.c`. It bypasses the native CLI's pthread stack allocation and
+4. The same script builds OpenVerse's C runtime (every `runtime/src/*.c` but
+   the native CLI's `main.c`) with `wasm/runtime.c`. It bypasses the native CLI's pthread stack allocation and
    uses a fixed 16 MiB WASM stack, with conservative runtime recursion limits.
 5. `web/service-worker.js` receives source over a `MessageChannel`, instantiates
    the compiler, transfers bytecode to the C runtime, and returns output and

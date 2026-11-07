@@ -101,7 +101,9 @@ link = ['-O2', '-sMODULARIZE=1', '-sALLOW_MEMORY_GROWTH=1', '-sINITIAL_MEMORY=67
 run(['em++', *map(str, objects), *link, '-sDISABLE_EXCEPTION_CATCHING=0',
                 '-sEXPORT_NAME=VerseCompiler', '-o', str(OUT / 'compiler.js')])
 
-runtime_sources = [OV / 'runtime/src' / (name + '.c') for name in ('arith', 'store', 'load', 'value', 'objects', 'prims', 'interp')]
+# Every runtime source except the native command line (main.c), so that a new
+# runtime file (floats.c, say) needs no change here.
+runtime_sources = sorted(p for p in (OV / 'runtime/src').glob('*.c') if p.name != 'main.c')
 run(['emcc', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
                 '-I' + str(OV / 'runtime/include'), *map(str, runtime_sources), str(ROOT / 'wasm/runtime.c'),
                 *link, '-sEXPORT_NAME=VerseRuntime', '-sEXPORTED_FUNCTIONS=["_run_bytecode","_malloc","_free"]',
