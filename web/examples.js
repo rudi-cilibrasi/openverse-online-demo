@@ -36,6 +36,25 @@ Main():void =
 `,
     args: '',
   },
+  fractions: {
+    source: `# Dividing ints gives an exact rational: 25 / 3 stays 25/3, never 8.
+# Dividing by zero fails, so a division sits in a failure context.
+
+Average(Scores:[]int)<decides>:rational =
+    var Total:int = 0
+    for (S : Scores):
+        set Total += S
+    Total / Scores.Length
+
+Main():void =
+    if (A := Average[array{7, 8, 10}]):
+        Print("the average is between {Floor(A)} and {Ceil(A)}")
+        if (A = 25 / 3) then Print("exactly 25/3")
+    if (not Average[array{}]):
+        Print("no scores, no average: the division failed")
+`,
+    args: '',
+  },
   shapes: {
     source: `# Classes behind an interface, overloading, and a generic function.
 

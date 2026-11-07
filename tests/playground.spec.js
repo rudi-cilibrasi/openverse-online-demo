@@ -40,6 +40,8 @@ test('all examples, text arguments, and transactional rollback', async ({ page }
   expect(await run(page)).toBe('The condition failed; the change rolled back.\nAttempts = 0');
   await page.selectOption('#example', 'loops');
   expect(await run(page)).toBe('2 / 2 = 1\n4 / 2 = 2\n6 / 2 = 3\n8 / 2 = 4\n10 / 2 = 5');
+  await page.selectOption('#example', 'fractions');
+  expect(await run(page)).toBe('the average is between 8 and 9\nexactly 25/3\nno scores, no average: the division failed');
   await page.selectOption('#example', 'shapes');
   expect(await run(page)).toBe('a square of area 9\na rectangle of area 10\n2 shapes\ntotal area: 19\nthe last is a rectangle');
   await page.selectOption('#example', 'args');
