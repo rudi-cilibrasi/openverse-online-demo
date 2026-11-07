@@ -1,0 +1,107 @@
+# Daily: build and browser-test the playground against openverse main instead of
+# the commit pinned in sources.json. One issue, "Canary: the playground on openverse
+# main", says whether the pin can move ("ready to bump") or what a newer openverse
+# breaks, before anyone bumps it; it closes itself once the pin is current.
+name: canary
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: canary
+  cancel-in-progress: true
+
+env:
+  TITLE: "Canary: the playground on openverse main"
+
+jobs:
+  canary:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Point sources.json at openverse main
+        id: pin
+        run: |
+          head=$(git ls-remote https://github.com/rudi-cilibrasi/openverse.git refs/heads/main | cut -f1)
+          pinned=$(jq -r .openverse.commit sources.json)
+          echo "head=$head" >> "$GITHUB_OUTPUT"
+          echo "pinned=$pinned" >> "$GITHUB_OUTPUT"
+          echo "behind=$([ "$head" != "$pinned" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          jq --arg c "$head" '.openverse.commit = $c' sources.json > sources.new && mv sources.new sources.json
+
+      - name: Cache elan, the Lean build and the WebAssembly objects
+        if: steps.pin.outputs.behind == 'true'
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.elan
+            .build/objects
+            .build/openverse/.lake
+          key: build-${{ runner.os }}-${{ hashFiles('sources.json', 'patches/**', 'wasm/**', 'scripts/build-wasm.py') }}
+          restore-keys: |
+            build-${{ runner.os }}-
+
+      - name: Build against openverse main
+        id: build
+        if: steps.pin.outputs.behind == 'true'
+        continue-on-error: true
+        run: |
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+          PATH="$HOME/.elan/bin:$PATH" scripts/install-deps.sh
+          PATH="$HOME/.elan/bin:$PATH" scripts/build.sh
+
+      - uses: actions/setup-node@v7
+        if: steps.build.outcome == 'success'
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Browser tests
+        id: test
+        if: steps.build.outcome == 'success'
+        continue-on-error: true
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          npm test
+
+      - name: Report in the canary issue
+        if: steps.pin.outputs.behind == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD: ${{ steps.pin.outputs.head }}
+          PINNED: ${{ steps.pin.outputs.pinned }}
+          PASSED: ${{ steps.build.outcome == 'success' && steps.test.outcome == 'success' }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ "$PASSED" = true ]; then
+            verdict="**Ready to bump.** openverse \`${HEAD:0:7}\` builds and passes every browser test: set it in \`sources.json\`."
+          else
+            verdict="**Needs attention.** With openverse \`${HEAD:0:7}\` the playground does not build or does not pass its browser tests: see [the run]($RUN)."
+          fi
+          body="$verdict
+
+          Pinned: \`${PINNED:0:7}\` · [what changed since](https://github.com/rudi-cilibrasi/openverse/compare/${PINNED}...${HEAD}) · checked $(date -u +%F) by [the canary]($RUN). This issue closes itself once \`sources.json\` pins openverse main."
+          n=$(gh issue list --state open --json number,title --jq '.[] | select(.title == env.TITLE) | .number' | head -1)
+          if [ -n "$n" ]; then gh issue edit "$n" --body "$body"; else gh issue create --title "$TITLE" --body "$body"; fi
+
+      - name: Close the canary issue once the pin is current
+        if: steps.pin.outputs.behind == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for n in $(gh issue list --state open --json number,title --jq '.[] | select(.title == env.TITLE) | .number'); do
+            gh issue close "$n" --comment "sources.json pins openverse main again."
+          done
+
+      - name: Fail the run when openverse main breaks the playground
+        if: steps.pin.outputs.behind == 'true' && (steps.build.outcome != 'success' || steps.test.outcome != 'success')
+        run: exit 1

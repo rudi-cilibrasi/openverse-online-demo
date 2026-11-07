@@ -158,7 +158,9 @@ There is no backend compiler or third-party CDN dependency.
 
 CI (`.github/workflows/test.yml`) builds the playground from source and runs
 the browser tests on every push and pull request; the built `dist/` is the
-run's `playground` artifact. Locally, after building:
+run's `playground` artifact. A daily canary (`.github/workflows/canary.yml`) does
+the same against openverse main instead of the pinned commit and keeps one issue
+up to date: *ready to bump*, or what a newer openverse breaks. Locally, after building:
 
 ```sh
 npm ci
