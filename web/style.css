@@ -285,6 +285,10 @@ kbd{
 #source:focus{
   box-shadow:inset 2px 0 0 #c7dd9b
 }
+.editor-actions{
+  display:flex;
+  gap:14px
+}
 .editor-bottom{
   display:flex;
   align-items:center;

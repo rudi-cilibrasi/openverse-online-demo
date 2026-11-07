@@ -22,6 +22,35 @@ function updateLines() {
 function save() {
   try { localStorage.setItem('openverse-playground', JSON.stringify({ source: source.value, args: args.value, example: $('example').value })); } catch { /* Storage is optional. */ }
 }
+// A link can carry a program: #code=…&args=…, percent-encoded UTF-8. The
+// fragment never reaches the server. Once loaded it is removed from the address
+// bar, so that a reload keeps later edits (they are saved like any others).
+function loadFromLink() {
+  const params = new URLSearchParams(location.hash.slice(1));
+  const code = params.get('code');
+  if (code === null) return;
+  source.value = code;
+  args.value = params.get('args') ?? '';
+  $('arguments').open = Boolean(args.value);
+  history.replaceState(null, '', location.pathname + location.search);
+  updateLines(); save();
+}
+function linkToProgram() {
+  const params = new URLSearchParams({ code: source.value });
+  if (args.value) params.set('args', args.value);
+  return `${location.origin}${location.pathname}#${params}`;
+}
+async function copyLink() {
+  const link = linkToProgram(), button = $('share');
+  try {
+    await navigator.clipboard.writeText(link);
+    button.textContent = 'Link copied';
+  } catch {
+    history.replaceState(null, '', link); // no clipboard: leave it in the address bar
+    button.textContent = 'Link in address bar';
+  }
+  setTimeout(() => { button.textContent = 'Copy link'; }, 2000);
+}
 function loadExample() {
   const example = examples[$('example').value];
   source.value = example.source;
@@ -37,11 +66,14 @@ if (saved && typeof saved.source === 'string' && typeof saved.args === 'string')
   $('arguments').open = Boolean(args.value);
   updateLines();
 }
+loadFromLink();
+window.addEventListener('hashchange', loadFromLink);
 source.addEventListener('input', () => { updateLines(); save(); });
 source.addEventListener('scroll', () => { $('line-numbers').scrollTop = source.scrollTop; });
 args.addEventListener('input', save);
 $('example').addEventListener('change', loadExample);
 $('reset').addEventListener('click', loadExample);
+$('share').addEventListener('click', copyLink);
 $('clear').addEventListener('click', () => { messages = []; $('output').textContent = ''; $('output').hidden = true; $('empty-output').hidden = false; });
 source.addEventListener('keydown', event => {
   if (event.key === 'Tab' && !event.shiftKey) {
