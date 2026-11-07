@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Write and run Verse in your browser with the independent OpenVerse interpreter.">
+  <meta name="theme-color" content="#173f35">
+  <title>OpenVerse — a little language playground</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23173f35'/%3E%3Cpath d='m10 12 10 17 10-17' fill='none' stroke='%23dbef9b' stroke-width='4'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <a class="brand" href="./" aria-label="OpenVerse home"><span class="brand-mark" aria-hidden="true">v.</span> openverse<span class="brand-label">PLAYGROUND</span></a>
+    <a class="source-link" href="https://github.com/rudi-cilibrasi/openverse" target="_blank" rel="noreferrer">Explore the language <span aria-hidden="true">↗</span></a>
+  </header>
+  <main>
+    <div class="intro">
+      <div><p class="eyebrow">SMALL PROGRAMS. INTERESTING POSSIBILITIES.</p><h1>A little room for Verse<span>.</span></h1><p class="lede">Try an idea, follow a loop, let something fail.<br>Write a few lines and see where they take you.</p></div>
+      <div class="intro-note"><span class="note-star" aria-hidden="true">✳</span><p>No setup, just curiosity.<br>Your code runs in your browser.</p></div>
+    </div>
+    <section class="playground" aria-label="Verse editor and output">
+      <div class="toolbar">
+        <div class="example-control"><label for="example">Start with</label><select id="example"><option value="hello">Hello, Verse</option><option value="rollback">Failure &amp; rollback</option><option value="loops">Loops &amp; numbers</option><option value="args">A little conversation</option></select></div>
+        <div class="run-controls"><label class="fuel-label" for="fuel">Step limit <select id="fuel"><option value="10000">10,000</option><option value="100000" selected>100,000</option><option value="1000000">1,000,000</option></select></label><button id="run" class="run-button" disabled><span aria-hidden="true">▶</span> Run code <kbd>⌘ / Ctrl ↵</kbd></button></div>
+      </div>
+      <div class="workspace">
+        <div class="editor-panel">
+          <div class="panel-heading"><label for="source"><span class="file-dot" aria-hidden="true"></span> Main.verse</label><span id="line-count">VERSE</span></div>
+          <div class="editor"><div id="line-numbers" aria-hidden="true">1</div><textarea id="source" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-describedby="editor-help"></textarea></div>
+          <div class="editor-bottom"><span id="editor-help">Four spaces to indent. Ctrl / ⌘ + Enter to run.</span><button id="reset" class="text-button">Reset example</button></div>
+          <details id="arguments"><summary>Program arguments <span>optional input</span></summary><label for="args">One argument per line; your program reads them from <code>Args</code>.</label><textarea id="args" rows="3" spellcheck="false" placeholder="Ada"></textarea></details>
+        </div>
+        <div class="output-panel">
+          <div class="panel-heading"><h2>Output</h2><button id="clear" class="text-button">Clear</button></div>
+          <div id="empty-output" class="empty-output"><span class="output-symbol" aria-hidden="true">↳</span><p>A thought becomes a program.</p><p>Press <strong>Run code</strong> to see what happens.</p></div>
+          <pre id="output" tabindex="0" aria-label="Program output" aria-live="polite" aria-atomic="true" hidden></pre>
+          <div class="status-row"><span id="status" role="status"><span class="status-dot" aria-hidden="true"></span>Getting ready…</span><span id="timing"></span></div>
+        </div>
+      </div>
+    </section>
+    <div class="below"><p><span aria-hidden="true">↗</span> Try changing a number, a message, or a condition. Run it again.</p><p>Made for experimenting.</p></div>
+    <details class="about"><summary>A note on this playground</summary><p>This uses <a href="https://github.com/rudi-cilibrasi/openverse">OpenVerse</a>, an independent implementation of a subset of Verse. It is not affiliated with Epic Games. Programs start at <code>Main():void</code>. Use <code>Print("hello")</code> for output and <code>Args</code> for text input. Mouse, graphics, and live stdin are not available here.</p><p>The step limit keeps loops bounded. Output is shown when execution finishes, including Verse’s rollback rules. This playground accepts one source file; filesystem imports are unavailable.</p></details>
+  </main>
+  <footer><span>OPENVERSE <span class="footer-slash">/</span> AN INDEPENDENT LANGUAGE EXPERIMENT</span><span>Built to be played with.</span></footer>
+</body>
+</html>
