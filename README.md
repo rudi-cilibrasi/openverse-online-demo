@@ -70,6 +70,14 @@ means no arguments. Input is supplied before each run; there is no interactive
 stdin, mouse API, graphics, or filesystem import support. Source and arguments
 are saved in browser local storage when available.
 
+Compiler errors include the filename, one-based line and column, the offending
+source line, and a caret. Download problems have separate messages naming the
+missing compiler/runtime file, its HTTP status when available, and recovery
+steps. Successful WASM downloads are retained for the service worker's lifetime,
+so subsequent runs in that worker can report syntax errors and execute programs
+without another download. This cache is in memory; the browser may stop idle
+service workers, so it is not a guarantee of offline operation after a reload.
+
 ## How it works
 
 1. `scripts/fetch-sources.py` fetches the exact GitHub revisions and applies the
@@ -136,7 +144,8 @@ CHROMIUM_PATH=/usr/bin/google-chrome npm test
 The browser suite exercises edited source through real WASM, every example,
 Unicode arguments, transactional rollback, compiler/runtime errors and recovery,
 bounded infinite loops, GUI responsiveness, local storage, keyboard execution,
-and a mobile viewport. It also checks that the main page makes zero WebAssembly
+a mobile viewport, source diagnostics while offline, and recovery from missing
+compiler/runtime downloads. It also checks that the main page makes zero WebAssembly
 compilation/instantiation calls and that the runner is an actual
 `ServiceWorkerGlobalScope`.
 

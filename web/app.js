@@ -1,4 +1,5 @@
 import { examples } from './examples.js';
+import { formatDiagnostic } from './diagnostics.js';
 const $ = id => document.getElementById(id);
 const source = $('source'), args = $('args'), runButton = $('run');
 let worker;
@@ -66,6 +67,7 @@ function run() {
   if (running || !worker) return;
   running = true;
   const serial = ++runSerial;
+  const submittedSource = source.value;
   runButton.disabled = true;
   runButton.setAttribute('aria-busy', 'true');
   messages = []; $('output').textContent = ''; $('output').classList.remove('error');
@@ -86,16 +88,17 @@ function run() {
   channel.port1.onmessage = ({ data }) => {
     if (serial !== runSerial) return;
     if (data.type === 'phase') status(data.phase, 'running');
+    if (data.type === 'diagnostic') display(formatDiagnostic(submittedSource, data.text), true);
     if (data.type === 'stdout' || data.type === 'stderr') display(data.text, data.type === 'stderr');
     if (data.type === 'done') {
       finish(); channel.port1.close();
       const labels = { 0: 'Finished', 1: 'Program failed', 2: 'Runtime error', 3: 'Step or resource limit', 4: 'Check your source' };
-      status(labels[data.code] || `Exit ${data.code}`, data.code === 0 ? 'ready' : 'error');
+      status(data.errorKind === 'loading' ? 'Runner unavailable' : labels[data.code] || `Exit ${data.code}`, data.code === 0 ? 'ready' : 'error');
       $('timing').textContent = `${Math.round(data.duration)} ms`;
       if (!messages.length) display('(Program finished without printing.)');
     }
   };
-  try { worker.postMessage({ type: 'run', source: source.value, args: args.value, fuel: Number($('fuel').value) }, [channel.port2]); }
+  try { worker.postMessage({ type: 'run', source: submittedSource, args: args.value, fuel: Number($('fuel').value) }, [channel.port2]); }
   catch (error) { finish(); display(error.message, true); status('Could not start', 'error'); }
 }
 

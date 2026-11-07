@@ -97,3 +97,45 @@ test('static hosting under a subdirectory preserves service worker scope and WAS
     expect(await page.evaluate(async () => (await navigator.serviceWorker.ready).scope)).toContain('/nested-demo/');
   } finally { fs.unlinkSync('dist/nested-demo'); }
 });
+
+test('syntax diagnostics show the source location and keep working after the server disconnects', async ({ page, context }) => {
+  await ready(page);
+  await run(page);
+  await context.setOffline(true);
+  try {
+    const output = await run(page, 'Main():void =\n    Print("missing quote)\n', 'Check your source');
+    expect(output).toContain('Main.verse:2:26: unterminated string literal');
+    expect(output).toContain('2 |     Print("missing quote)');
+    expect(output).toContain('^');
+    expect(output).not.toContain('fetch');
+    const unknown = await run(page, 'Main():void =\n    Print(UnknownName)\n', 'Check your source');
+    expect(unknown).toContain('Main.verse:2:11: unknown identifier');
+    expect(unknown.split('\n').at(-1)).toBe('  |           ^');
+    expect(await run(page, 'Main():void =\n    Print("Offline recovery")\n')).toBe('Offline recovery');
+  } finally { await context.setOffline(false); }
+});
+
+test('missing compiler download is explained and retried after repair', async ({ page, context }) => {
+  await context.route('**/wasm/compiler.wasm', route => route.fulfill({ status: 404, body: 'Not found' }));
+  await ready(page);
+  const missing = await run(page, 'Main(:void = ???', 'Runner unavailable');
+  expect(missing).toContain('Could not load the Verse compiler');
+  expect(missing).toContain('compiler.wasm returned HTTP 404');
+  expect(missing).toContain('Rebuild the demo');
+  await context.unroute('**/wasm/compiler.wasm');
+  const syntax = await run(page, 'Main(:void = ???', 'Check your source');
+  expect(syntax).toContain('Main.verse:1:6: expected an identifier');
+  expect(syntax).toContain('1 | Main(:void = ???');
+});
+
+test('runtime download errors are distinct from source errors and recover after repair', async ({ page, context }) => {
+  await context.route('**/wasm/runtime.wasm', route => route.abort('failed'));
+  await ready(page);
+  expect(await run(page, 'Main(:void = ???', 'Check your source')).toContain('expected an identifier');
+  const missing = await run(page, 'Main():void =\n    Print("Recovered")\n', 'Runner unavailable');
+  expect(missing).toContain('Could not load the Verse runtime');
+  expect(missing).toContain('make sure the demo server is running');
+  expect(missing).not.toContain('Failed to fetch');
+  await context.unroute('**/wasm/runtime.wasm');
+  expect(await run(page)).toBe('Recovered');
+});
