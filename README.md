@@ -54,7 +54,8 @@ runtime adapter and rerunning the browser tests.
 ## Try it
 
 Choose an example, edit `Main.verse`, then click **Run code** (or Ctrl/⌘+Enter).
-The examples cover output, loops, failure contexts and rollback, and arguments.
+The examples cover output, loops, failure contexts and rollback, classes behind
+an interface with overloading and a generic function, and arguments.
 
 ```verse
 Main():void =
