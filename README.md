@@ -1,5 +1,12 @@
 # OpenVerse online demo
 
+Try [text output here](https://rudi-cilibrasi.github.io/openverse-docs/demo/) or
+explore a [3D island in Overfort Sim](https://rudi-cilibrasi.github.io/openverse-docs/sim/).
+Both use the same Verse language concepts—values, loops, conditions, and state—
+in different contexts. Each toy has its own examples and API. The
+[OpenVerse docs landing page](https://rudi-cilibrasi.github.io/openverse-docs/)
+introduces both playgrounds and the books.
+
 [![test](https://github.com/rudi-cilibrasi/openverse-online-demo/actions/workflows/test.yml/badge.svg)](https://github.com/rudi-cilibrasi/openverse-online-demo/actions/workflows/test.yml)
 
 **Try it: <https://rudi-cilibrasi.github.io/openverse-docs/demo/>**, published

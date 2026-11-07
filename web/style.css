@@ -604,3 +604,15 @@ footer>span:last-child{
     animation:none
   }
 }
+
+/* The same language can drive text output or a game world. */
+.masthead { flex-wrap: wrap; gap: 16px; }
+.masthead-links { flex-wrap: wrap; }
+.context-switch { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin: 0 0 24px; padding: 20px 22px; background: #eaf0da; border: 1px solid #ccd9b7; border-radius: 8px; }
+.context-switch strong { font-size: 14px; font-weight: 650; }
+.context-switch p { color: #53694f; font-size: 12px; line-height: 1.8; margin: 6px 0 0; max-width: 740px; }
+.context-link { font-size: 12px; font-weight: 650; white-space: nowrap; text-underline-offset: 4px; }
+@media (max-width: 640px) {
+  .context-switch { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px; }
+  .context-switch p { font-size: 11px; }
+}
