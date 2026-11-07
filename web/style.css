@@ -78,13 +78,19 @@ button:hover{
   padding-left:20px;
   color:var(--muted)
 }
+.masthead-links{
+  display:flex;
+  align-items:center;
+  gap:28px
+}
 .source-link{
   font-size:12px;
-  text-decoration:none
+  text-decoration:none;
+  white-space:nowrap
 }
 .source-link span{
-  padding-left:12px;
-  font-size:18px
+  padding-left:8px;
+  font-size:16px
 }
 main{
   max-width:1392px;
@@ -287,7 +293,8 @@ kbd{
 }
 .editor-actions{
   display:flex;
-  gap:14px
+  gap:14px;
+  white-space:nowrap
 }
 .editor-bottom{
   display:flex;
@@ -505,15 +512,14 @@ footer>span:last-child{
     font-size:19px
   }
   .brand-label{
-    font-size:8px;
-    margin-left:4px;
-    padding-left:10px
+    display:none
   }
-  .source-link{
-    font-size:0
+  .masthead-links{
+    gap:16px
   }
   .source-link span{
-    font-size:19px
+    padding-left:4px;
+    font-size:14px
   }
   main{
     padding:0 16px
