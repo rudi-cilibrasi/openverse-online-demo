@@ -87,6 +87,31 @@ test('source and arguments survive reload; mobile page fits and keyboard runs', 
   await expect(page.locator('#output')).toHaveText('Saved program');
 });
 
+test('a link opens a program with its arguments, and Copy link makes one', async ({ page, context }) => {
+  const program = '# Grüße aus dem Link\nMain():void =\n    if (A := Args[0]):\n        Print("Hello, {A}: {Args.Length} argument")\n';
+  await page.goto('/#' + new URLSearchParams({ code: program, args: 'zwölf' }));
+  await expect(page.locator('#run')).toBeEnabled({ timeout: 30000 });
+  await expect(page.locator('#source')).toHaveValue(program);
+  await expect(page.locator('#args')).toHaveValue('zwölf');
+  expect(new URL(page.url()).hash).toBe('');
+  expect(await run(page)).toBe('Hello, zwölf: 1 argument');
+  await page.reload();
+  await expect(page.locator('#source')).toHaveValue(program);
+  // A link followed while the page is open replaces the program too.
+  await page.evaluate(() => { location.hash = 'code=' + encodeURIComponent('Main():void = Print("again")'); });
+  await expect(page.locator('#source')).toHaveValue('Main():void = Print("again")');
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await expect(page.locator('#args')).toBeHidden(); // that link had no arguments
+  await page.locator('#arguments summary').click();
+  await page.locator('#args').fill('a b+c');
+  await page.locator('#share').click();
+  await expect(page.locator('#share')).toHaveText('Link copied');
+  const copied = new URL(await page.evaluate(() => navigator.clipboard.readText()));
+  const params = new URLSearchParams(copied.hash.slice(1));
+  expect(params.get('code')).toBe('Main():void = Print("again")');
+  expect(params.get('args')).toBe('a b+c');
+});
+
 test('static hosting under a subdirectory preserves service worker scope and WASM paths', async ({ page }) => {
   const fs = require('node:fs');
   fs.symlinkSync('.', 'dist/nested-demo', 'dir');

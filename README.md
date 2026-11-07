@@ -64,6 +64,12 @@ Main():void =
         Print("Hello, Verse!")
 ```
 
+A link can open a program: `…/demo/#code=SOURCE&args=ARGS`, with `SOURCE` and
+`ARGS` percent-encoded (arguments one per line, optional). **Copy link** makes
+such a link for the program in the editor. The fragment stays in the browser,
+like the program itself; once loaded it is cleared from the address bar, so a
+reload keeps later edits.
+
 Open **Program arguments** and enter one argument per line. The interpreter
 receives these through OpenVerse's existing `Args:[]string` support. Empty input
 means no arguments. Input is supplied before each run; there is no interactive
