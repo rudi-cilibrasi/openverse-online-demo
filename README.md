@@ -38,10 +38,10 @@ Upstream and Lean commits are pinned in [sources.json](sources.json), and record
 in `dist/build-info.json`. Checkouts, native intermediate files, and cached WASM
 objects live under `.build/`; outputs live under `dist/`. Both are ignored by
 Git. The scripts use their own checkouts and leave sibling repositories alone.
-The pinned OpenVerse source contains two uses of the removed `String.dropRight`
-API. [The small compatibility patch](patches/openverse/lean-4.34-string.patch) replaces them
-with `dropEnd`. A second patch makes the runtime's allocation bounds safe on
-32-bit targets. Both apply idempotently to the demo's build checkout.
+OpenVerse itself builds for WebAssembly unpatched (since
+[openverse#124](https://github.com/rudi-cilibrasi/openverse/pull/124)). Any patch
+placed in `patches/openverse/` or `patches/lean4/` is applied idempotently to that
+build checkout; today only Lean's runtime needs one.
 
 The pinned Lean runtime also needs [target compatibility fixes](patches/lean4/wasm-runtime.patch):
 two WASM stub signatures, two obsolete FFI world parameters, and exclusion of
@@ -94,7 +94,7 @@ service workers, so it is not a guarantee of offline operation after a reload.
 ## How it works
 
 1. `scripts/fetch-sources.py` fetches the exact GitHub revisions and applies the
-   compatibility patch. `build.sh` uses upstream's own lexer, parser, elaborator,
+   patches in `patches/`. `build.sh` uses upstream's own lexer, parser, elaborator,
    and checks to generate C with its pinned native Lean toolchain.
 2. `wasm/Compiler.lean` exposes upstream parsing, `Front.compileTops`, and OVBC encoding. A small C
    adapter exposes the compiler's byte buffer to JavaScript. No reimplementation
