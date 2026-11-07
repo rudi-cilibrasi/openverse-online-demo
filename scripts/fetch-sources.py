@@ -22,8 +22,8 @@ for name, spec in json.loads((root / 'sources.json').read_text()).items():
         git('checkout', '--detach', spec['commit'])
     print(f'{name}: {spec["commit"]}', flush=True)
 
-# A compatibility fix for the pinned upstream's two obsolete String API calls.
-# It is idempotent; no dependency installer is copied into OpenVerse.
+# Compatibility patches in patches/<name>/, applied idempotently (today only
+# Lean's runtime needs one). No dependency installer is copied into OpenVerse.
 for name in ('openverse', 'lean4'):
     for patch in sorted((root / 'patches' / name).glob('*.patch')):
         cmd = ['git', '-C', str(root / '.build' / name), 'apply']
