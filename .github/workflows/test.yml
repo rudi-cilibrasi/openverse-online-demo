@@ -26,7 +26,7 @@ jobs:
       # The object cache is content-addressed, so an older cache stays useful when
       # sources.json moves: only changed sources are recompiled.
       - name: Cache elan, the Lean build and the WebAssembly objects
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.elan
