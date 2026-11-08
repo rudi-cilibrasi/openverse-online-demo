@@ -1,7 +1,8 @@
 # Daily: build and browser-test the playground against openverse main instead of
 # the commit pinned in sources.json. One issue, "Canary: the playground on openverse
 # main", says whether the pin can move ("ready to bump") or what a newer openverse
-# breaks, before anyone bumps it; it closes itself once the pin is current.
+# breaks, before anyone bumps it; it closes itself once the pin is current, or once
+# main differs from the pin only outside the build inputs (docs, tests).
 name: canary
 
 on:
@@ -29,12 +30,20 @@ jobs:
 
       - name: Point sources.json at openverse main
         id: pin
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           head=$(git ls-remote https://github.com/rudi-cilibrasi/openverse.git refs/heads/main | cut -f1)
           pinned=$(jq -r .openverse.commit sources.json)
           echo "head=$head" >> "$GITHUB_OUTPUT"
           echo "pinned=$pinned" >> "$GITHUB_OUTPUT"
-          echo "behind=$([ "$head" != "$pinned" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          # Behind only if main changed something the playground is built from: the
+          # front end and Core (OpenVerse/, Main.lean), the C runtime, or the Lean
+          # and Lake setup. A commit that only touches docs or tests changes nothing here.
+          changed=$(gh api "repos/rudi-cilibrasi/openverse/compare/${pinned}...${head}" --paginate \
+                      --jq '.files[].filename' | grep -E '^(OpenVerse/|runtime/|Main\.lean$|lakefile|lake-manifest\.json$|lean-toolchain$)' || true)
+          echo "behind=$([ -n "$changed" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "Build inputs changed since ${pinned:0:7}: $(echo "$changed" | grep -c . || true)"
           jq --arg c "$head" '.openverse.commit = $c' sources.json > sources.new && mv sources.new sources.json
 
       - name: Cache elan, the Lean build and the WebAssembly objects
@@ -99,7 +108,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           for n in $(gh issue list --state open --json number,title --jq '.[] | select(.title == env.TITLE) | .number'); do
-            gh issue close "$n" --comment "sources.json pins openverse main again."
+            gh issue close "$n" --comment "Nothing the playground is built from has changed since the pinned commit."
           done
 
       - name: Fail the run when openverse main breaks the playground
