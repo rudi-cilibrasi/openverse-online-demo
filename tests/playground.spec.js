@@ -91,6 +91,22 @@ test('source and arguments survive reload; mobile page fits and keyboard runs', 
   await expect(page.locator('#output')).toHaveText('Saved program');
 });
 
+test('an unedited example is saved by name, so it stays current; edits are saved in full', async ({ page }) => {
+  await ready(page);
+  const record = () => page.evaluate(() => JSON.parse(localStorage.getItem('openverse-playground')));
+  await page.selectOption('#example', 'loops');
+  expect(await record()).toEqual({ example: 'loops' });
+  const loops = await page.locator('#source').inputValue();
+  await page.reload();
+  await expect(page.locator('#run')).toBeEnabled();
+  await expect(page.locator('#example')).toHaveValue('loops');
+  await expect(page.locator('#source')).toHaveValue(loops);
+  await page.locator('#source').fill(loops + '# mine\n');
+  expect(await record()).toEqual({ source: loops + '# mine\n', args: '', example: 'loops' });
+  await page.locator('#reset').click();
+  expect(await record()).toEqual({ example: 'loops' });
+});
+
 test('a link opens a program with its arguments, and Copy link makes one', async ({ page, context }) => {
   const program = '# Grüße aus dem Link\nMain():void =\n    if (A := Args[0]):\n        Print("Hello, {A}: {Args.Length} argument")\n';
   await page.goto('/#' + new URLSearchParams({ code: program, args: 'zwölf' }));

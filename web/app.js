@@ -19,8 +19,14 @@ function updateLines() {
   $('line-numbers').textContent = Array.from({ length: count }, (_, index) => index + 1).join('\n');
   $('line-numbers').scrollTop = source.scrollTop;
 }
+// The saved record names the chosen example, and holds the source and
+// arguments only when they differ from it, so an example nobody edited loads
+// its current text after the examples change.
 function save() {
-  try { localStorage.setItem('openverse-playground', JSON.stringify({ source: source.value, args: args.value, example: $('example').value })); } catch { /* Storage is optional. */ }
+  const name = $('example').value, example = examples[name];
+  const edited = !example || source.value !== example.source || args.value !== example.args;
+  const record = edited ? { source: source.value, args: args.value, example: name } : { example: name };
+  try { localStorage.setItem('openverse-playground', JSON.stringify(record)); } catch { /* Storage is optional. */ }
 }
 // A link can carry a program: #code=…&args=…, percent-encoded UTF-8. The
 // fragment never reaches the server. Once loaded it is removed from the address
@@ -58,14 +64,15 @@ function loadExample() {
   $('arguments').open = $('example').value === 'args';
   updateLines(); save();
 }
-source.value = examples.hello.source;
-updateLines();
+const chosen = saved && examples[saved.example] ? saved.example : 'hello';
+$('example').value = chosen;
+source.value = examples[chosen].source;
+args.value = examples[chosen].args;
 if (saved && typeof saved.source === 'string' && typeof saved.args === 'string') {
   source.value = saved.source; args.value = saved.args;
-  if (examples[saved.example]) $('example').value = saved.example;
-  $('arguments').open = Boolean(args.value);
-  updateLines();
 }
+$('arguments').open = Boolean(args.value);
+updateLines();
 loadFromLink();
 window.addEventListener('hashchange', loadFromLink);
 source.addEventListener('input', () => { updateLines(); save(); });
