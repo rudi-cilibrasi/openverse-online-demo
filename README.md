@@ -67,7 +67,8 @@ first, then checking its runtime patch and adapter and rerunning the browser tes
 Choose an example, edit `Main.verse`, then click **Run code** (or Ctrl/⌘+Enter).
 The examples cover output, loops, failure contexts and rollback, exact rational
 and float arithmetic, classes behind an interface with overloading and a generic
-function, tasks racing on the virtual clock, and arguments.
+function, functions and methods passed around as values, tasks racing on the
+virtual clock, and arguments.
 
 ```verse
 Main():void =
