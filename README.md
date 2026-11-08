@@ -9,12 +9,9 @@ introduces both playgrounds and the books.
 
 [![test](https://github.com/rudi-cilibrasi/openverse-online-demo/actions/workflows/test.yml/badge.svg)](https://github.com/rudi-cilibrasi/openverse-online-demo/actions/workflows/test.yml)
 
-**Try it: <https://rudi-cilibrasi.github.io/openverse-docs/demo/>**, published
-with the openverse books by [openverse-docs](https://github.com/rudi-cilibrasi/openverse-docs),
-which includes this repository as its `demo/` submodule.
-
-An editable Verse playground that compiles and runs entirely in a browser.
-It fetches [rudi-cilibrasi/openverse](https://github.com/rudi-cilibrasi/openverse.git),
+An editable Verse playground that compiles and runs entirely in a browser,
+published with the openverse books by [openverse-docs](https://github.com/rudi-cilibrasi/openverse-docs)
+(this repository is its `demo/` submodule). It fetches [rudi-cilibrasi/openverse](https://github.com/rudi-cilibrasi/openverse.git),
 builds its Lean source compiler and C runtime as two WebAssembly modules, and
 runs **both inside a service worker**, away from the GUI thread. The server only
 serves static files; it never receives user programs.
@@ -58,11 +55,12 @@ C++20 `bit_cast` fallback for Emscripten 3.1.6's old libc++ and derives the smal
 APIs are not exposed to Verse programs.
 
 To rebuild from scratch, remove `.build/` and `dist/` and run the build again.
-To update upstream, update the commit pins, check the compatibility patches,
-and remove `.build/openverse/` and `.build/lean4/` before rebuilding both modules
-together. Object caches can be retained. The fetcher refuses to overwrite the
-patched build checkouts when their revision changes. Changing Lean also requires checking the Lean
-runtime adapter and rerunning the browser tests.
+To move to a newer openverse, change its commit in `sources.json` and build
+again: its checkout carries no patches, so the fetcher simply moves it, and the
+object caches keep everything that did not change (when its `lean-toolchain`
+changes, move the `lean4` pin to that release too). A patched checkout is never
+moved (the fetcher stops instead), so changing Lean means removing `.build/lean4/`
+first, then checking its runtime patch and adapter and rerunning the browser tests.
 
 ## Try it
 
