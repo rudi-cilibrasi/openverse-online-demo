@@ -97,6 +97,32 @@ Main():void =
 `,
     args: '',
   },
+  functions: {
+    source: `# Functions are values: pass them, keep them, call them later.
+# A method value keeps its object: C.Add adds to C's Total.
+
+Twice(F:int->int, X:int):int = F(F(X))
+Double(X:int):int = 2 * X
+AddOne(X:int):int = X + 1
+
+counter := class:
+    var Total:int = 0
+    Add(X:int):void = set Total += X
+
+Cheer(X:int):void = Print("cheers for {X}!")
+
+Main():void =
+    Print("Twice(Double, 5) = {Twice(Double, 5)}")
+    for (F : array{Double, AddOne}):
+        Print("F(10) = {F(10)}")
+    C := counter{}
+    Listeners:[]type{_(:int):void} = array{C.Add, Cheer}
+    for (Points : array{3, 4}, Listen : Listeners):
+        Listen(Points)
+    Print("total: {C.Total}")
+`,
+    args: '',
+  },
   tasks: {
     source: `# A race between two tasks. They take turns on a virtual clock
 # (30 ticks a second) in a fixed order, so every run prints the
