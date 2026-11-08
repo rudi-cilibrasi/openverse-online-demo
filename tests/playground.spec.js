@@ -44,6 +44,8 @@ test('all examples, text arguments, and transactional rollback', async ({ page }
   expect(await run(page)).toBe('the exact average is between 8 and 9\nexactly 25/3\nno scores, no average: the division failed\nas floats: 25.0 / 3.0 = 8.333333333333334\n0.1 + 0.2 = 0.30000000000000004, and 1.0 / 0.0 = Inf\nSqrt(2.0) = 1.4142135623730951, Pow(2.0, 10.0) = 1024.0');
   await page.selectOption('#example', 'shapes');
   expect(await run(page)).toBe('a square of area 9\na rectangle of area 10\n2 shapes\ntotal area: 19\nthe last is a rectangle');
+  await page.selectOption('#example', 'tasks');
+  expect(await run(page)).toBe('tortoise: 3\nhare: 5\nhare: 4\ntortoise: 2\nhare: 3\nhare: 2\ntortoise: 1\nhare: 1\nthe hare wins');
   await page.selectOption('#example', 'args');
   await page.locator('#args').fill('Zoë 🌱\nVerse');
   expect(await run(page)).toBe('Hello, Zoë 🌱!\nYou said: Zoë 🌱\nYou said: Verse');
