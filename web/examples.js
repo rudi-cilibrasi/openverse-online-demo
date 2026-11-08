@@ -97,6 +97,28 @@ Main():void =
 `,
     args: '',
   },
+  tasks: {
+    source: `# A race between two tasks. They take turns on a virtual clock
+# (30 ticks a second) in a fixed order, so every run prints the
+# same lines, at once. Change a pause or a count: who wins?
+
+Countdown(Name:string, From:int, Pause:float)<suspends>:string =
+    var I:int = From
+    loop:
+        if (I <= 0) then break
+        Print("{Name}: {I}")
+        Sleep(Pause)
+        set I -= 1
+    Name
+
+Main()<suspends>:void =
+    Winner := race:
+        Countdown("tortoise", 3, 1.0)
+        Countdown("hare", 5, 0.5)
+    Print("the {Winner} wins")
+`,
+    args: '',
+  },
   args: {
     source: `# Open Program arguments below and add a name.
 # Each line becomes one item in Args.
