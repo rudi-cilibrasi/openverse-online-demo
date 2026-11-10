@@ -36,6 +36,23 @@ Main():void =
 `,
     args: '',
   },
+  choices: {
+    source: `# A choice (a | b) gives one value, then the next. A for takes them all,
+# left to right; an if takes the first that makes its condition succeed.
+
+# A function can give several values too: here, endlessly many.
+From(N:int):int = N | From(N + 1)
+
+Main():void =
+    for (A := 1 | 2 | 3, B := 1 | 2 | 3, A + B = 4):
+        Print("{A} + {B} = 4")
+    if (X := From(1), X * X > 50):
+        Print("the first square over 50: {X} * {X} = {X * X}")
+    Coins := for (C := 1 | 5 | 10 | 25, C > 3) { C }
+    Print("{Coins.Length} coins are worth more than 3 cents")
+`,
+    args: '',
+  },
   numbers: {
     source: `# Ints divide exactly, into a rational: 25 / 3 stays 25/3, and dividing
 # by zero fails. Floats (IEEE 64-bit) approximate, and never fail.
