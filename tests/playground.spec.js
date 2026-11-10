@@ -81,6 +81,21 @@ test('infinite loop is bounded, GUI stays responsive, and another run succeeds',
   expect(await run(page, 'Main():void =\n    Print("Still here")\n')).toBe('Still here');
 });
 
+test('flattening shared arrays is bounded on wasm32 and the next run recovers', async ({ page }) => {
+  await ready(page);
+  // Both arrays have 2^16 entries; flatten would need 2^32 result slots.
+  // Doubling keeps the setup small enough to reach flatten within the step limit.
+  const source = `Main():void =
+    var Xs:[]int = array{1}
+    for (I := 0..15) { set Xs = Xs + Xs }
+    var Groups:[][]int = array{Xs}
+    for (I := 0..15) { set Groups = Groups + Groups }
+    Print("{Concatenate(Groups).Length}")
+`;
+  expect(await run(page, source, 'Step or resource limit')).toContain('limit: memory');
+  expect(await run(page, 'Main():void = Print("Recovered after flatten")')).toBe('Recovered after flatten');
+});
+
 test('source and arguments survive reload; mobile page fits and keyboard runs', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await ready(page);
