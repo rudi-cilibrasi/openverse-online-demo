@@ -14,9 +14,11 @@ permissions:
   contents: read
   issues: write
 
+# (a run that has started finishes: GitHub often fires the 06:17 schedule hours late, and on
+# 2026-11-10 its run at 14:54 cancelled the one a carry had just dispatched, which stopped the carry)
 concurrency:
   group: canary
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 env:
   TITLE: "Canary: the playground on openverse main"
