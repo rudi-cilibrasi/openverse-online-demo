@@ -44,10 +44,17 @@ for directory in (INC, LEAN / 'src/include', LEAN / 'src/runtime'):
         headers.update(path.read_bytes())
 salt = version + headers.digest()
 
+# Generated C files over this size are compiled at -O0: at -O1, clang needs more than 12 GB for
+# OpenVerse/Front/Elab.c (23 MB of C at openverse 6e0c1ef), which takes a 16 GB CI runner down
+# (the canary of 2026-11-12); at -O0 it takes 8.3 GB and 2.5 min. The other modules are under 5 MB.
+BIG_C = int(os.environ.get('BIG_C_BYTES', 8 * 1024 * 1024))
+
 def compile_object(spec):
     source, cxx, extra = spec
     compiler = 'em++' if cxx else 'emcc'
     flags = common + (['-std=c++20', '-fexceptions', '-include', str(ROOT / 'wasm/libcxx-compat.h')] if cxx else []) + extra
+    if not cxx and source.stat().st_size > BIG_C:
+        flags = ['-O0' if f == '-O1' else f for f in flags]
     key = hashlib.sha256(salt + source.read_bytes() + ((ROOT / 'wasm/libcxx-compat.h').read_bytes() if cxx else b'') + repr((compiler, flags)).encode()).hexdigest()
     target = CACHE / (key + '.o')
     if not target.exists():
