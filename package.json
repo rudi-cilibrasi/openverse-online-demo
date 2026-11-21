@@ -7,5 +7,5 @@
     "serve": "python3 scripts/serve.py",
     "test": "playwright test"
   },
-  "devDependencies": { "@playwright/test": "1.65.0" }
+  "devDependencies": { "@playwright/test": "1.65.1" }
 }
